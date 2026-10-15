@@ -8,6 +8,13 @@
 Minecraft 1.21.11, Java 21, Fabric Loader 0.19.3+, Fabric API 0.141.6+1.21.11 và
 YACL 3.8.1+1.21.11-fabric. Fabric API/YACL không nằm trong hai gói cài chính.
 
+**Nếu profile chưa có YACL, bắt buộc tải và cài thêm
+[YACL 3.8.1 cho Fabric / Minecraft 1.21.11](https://modrinth.com/mod/yacl/version/NWFsMIGn).**
+Chép `yet_another_config_lib_v3-3.8.1+1.21.11-fabric.jar` vào `mods` của cả profile
+Use và profile Sell. Nếu đã có YACL tương thích thì không cài trùng.
+
+Tải JAR/ZIP từ [GitHub Release v2.0.0](https://github.com/Ethanizsmart/dual-donut-mod/releases/tag/v2.0.0).
+
 F8 master, F9 GUI. Chọn Auto Disconnect và/hoặc AntiPlayer trong menu Phát hiện
 người chơi rồi Save; cả hai mặc định OFF. Thêm tài khoản farm/sell còn lại vào
 whitelist nếu đứng gần nhau. Home và Vex Recovery tích hợp ở cả hai phía,

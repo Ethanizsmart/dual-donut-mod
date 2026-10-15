@@ -50,6 +50,11 @@ log và dữ liệu runtime vào repository.
   để tự bán đồ. GUI hiển thị delay, lọc item, tin nhắn và webhook Sell cùng các bảo vệ chung.
 - Cả hai bản đều tích hợp Auto Disconnect, AntiPlayer, Vex Recovery và giữ mốc/home;
   không cần AutoHome riêng. Cài Fabric API và YACL trong mỗi profile.
+- **Nếu profile chưa có YACL, bắt buộc cài thêm
+  [YACL 3.8.1 cho Fabric / Minecraft 1.21.11](https://modrinth.com/mod/yacl/version/NWFsMIGn)
+  vào thư mục `mods` của từng profile Use/Sell.** YACL không có sẵn trong hai ZIP cài đặt.
+- [GitHub Release v2.0.0](https://github.com/Ethanizsmart/dual-donut-mod/releases/tag/v2.0.0)
+  có JAR riêng, gói cài Use/Sell và SHA-256.
 - Gói cài và SHA-256: [DualDonutControl/releases/2.0.0](DualDonutControl/releases/2.0.0/).
   Chi tiết cài đặt và kiểm tra: [DualDonutControl/README.md](DualDonutControl/README.md).
 

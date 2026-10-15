@@ -29,6 +29,14 @@ Cả hai profile cần **Fabric Loader 0.19.3+**, **Fabric API 0.141.6+1.21.11**
 **YACL 3.8.1+1.21.11-fabric**. Mod Menu 17.0.1 là tùy chọn. Hai file ZIP cài đặt
 chứa đúng hai mod chính theo từng phía; Fabric API và YACL cài riêng nếu chưa có.
 
+**YACL là thư viện bắt buộc ở cả hai profile Use và Sell. Nếu profile chưa có YACL,
+tải [YACL 3.8.1 cho Fabric / Minecraft 1.21.11](https://modrinth.com/mod/yacl/version/NWFsMIGn)
+và chép `yet_another_config_lib_v3-3.8.1+1.21.11-fabric.jar` vào thư mục `mods`
+của profile đó.** Chọn đúng bản Fabric 1.21.11. Không cần chép thêm nếu profile
+đã có bản tương thích; YACL không được đóng gói trong hai ZIP cài đặt.
+
+Tải bản phát hành: [GitHub Release v2.0.0](https://github.com/Ethanizsmart/dual-donut-mod/releases/tag/v2.0.0).
+
 Dùng hai thư mục/profile Minecraft riêng. Chỉ cài bản Control tương ứng trong mỗi
 profile; Loader từ chối cài Use và Sell cùng nhau hoặc cùng Control 1.0.0 cũ.
 Nếu hai tài khoản farm/sell đứng gần nhau, thêm tên tài khoản còn lại vào danh
