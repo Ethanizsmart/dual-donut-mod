@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "dualdonutcontrol_${side}",
+  "version": "${version}",
+  "name": "Dual Donut Control ${sideName}",
+  "description": "${sideName} profile, F8 master, home anchor, Vex recovery, Auto Disconnect and AntiPlayer.",
+  "environment": "client",
+  "license": "MIT",
+  "entrypoints": {
+    "client": ["dev.dualdonut.DualDonutControl"],
+    "modmenu": ["dev.dualdonut.ModMenuIntegration"]
+  },
+  "mixins": ["dualdonutcontrol.mixins.json", "dualdonutcontrol-side.mixins.json"],
+  "depends": {
+    "fabricloader": ">=0.19.3",
+    "minecraft": "1.21.11",
+    "java": ">=21",
+    "fabric-api": ">=0.141.6+1.21.11",
+    "yet_another_config_lib_v3": ">=3.8.1",
+    "${baseMod}": "${baseVersion}"
+  },
+  "breaks": { "dualdonutcontrol": "*", "dualdonutcontrol_${otherSide}": "*" },
+  "suggests": { "modmenu": "*" }
+}

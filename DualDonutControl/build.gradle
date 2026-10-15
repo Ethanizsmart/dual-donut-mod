@@ -1,0 +1,144 @@
+plugins {
+    id 'fabric-loom' version '1.17.21'
+}
+
+version = '2.0.0'
+group = 'dev.dualdonut'
+def side = providers.gradleProperty('side').getOrElse('use')
+if (!(side in ['use', 'sell'])) throw new GradleException('Use -Pside=use or -Pside=sell')
+def sideName = side.capitalize()
+def baseMod = side == 'use' ? 'autousemod' : 'autosell_donut'
+def baseVersion = side == 'use' ? '1.0.1' : '1.3.3-webhook.1'
+def baseJar = side == 'use' ? '../SwordWebhookIntegration/AutoUseMod-1.0.1.jar' : '../SwordWebhookIntegration/autosell_donut-1.3.3-webhook.1.jar'
+base { archivesName = "DualDonutControl-${sideName}" }
+layout.buildDirectory = layout.projectDirectory.dir("build/${side}")
+
+repositories {
+    maven { url = 'https://maven.isxander.dev/releases' }
+    maven { url = 'https://maven.terraformersmc.com/releases' }
+}
+
+configurations { intermediaryIdentity }
+dependencies {
+    intermediaryIdentity('net.fabricmc:intermediary:1.21.11:v2') { transitive = false }
+}
+
+// All three restored projects use Intermediary identifiers in their sources.
+def identityJar = layout.projectDirectory.file('.gradle/identity-mappings/1.21.11.jar').asFile
+def tiny = zipTree(configurations.intermediaryIdentity.singleFile)
+    .matching { include 'mappings/mappings.tiny' }.singleFile.getText('UTF-8')
+def lines = tiny.readLines()
+assert lines[0] == 'tiny\t2\t0\tofficial\tintermediary'
+def mapped = new StringBuilder('tiny\t2\t0\tofficial\tintermediary\tnamed\n')
+lines.drop(1).each { line ->
+    mapped.append(line)
+    if (line.startsWith('c\t') || line.startsWith('\tm\t') || line.startsWith('\tf\t')) {
+        mapped.append('\t').append(line.substring(line.lastIndexOf('\t') + 1))
+    }
+    mapped.append('\n')
+}
+identityJar.parentFile.mkdirs()
+def mappingBytes = new ByteArrayOutputStream()
+new java.util.jar.JarOutputStream(mappingBytes).withCloseable { out ->
+    def entry = new java.util.jar.JarEntry('mappings/mappings.tiny')
+    entry.time = 0L
+    out.putNextEntry(entry)
+    out.write(mapped.toString().getBytes('UTF-8'))
+    out.closeEntry()
+}
+if (!identityJar.exists() || !java.util.Arrays.equals(identityJar.bytes, mappingBytes.toByteArray())) {
+    identityJar.bytes = mappingBytes.toByteArray()
+}
+
+dependencies {
+    minecraft 'com.mojang:minecraft:1.21.11'
+    mappings files(identityJar)
+    modImplementation 'net.fabricmc:fabric-loader:0.19.3'
+    modImplementation 'net.fabricmc.fabric-api:fabric-api:0.141.6+1.21.11'
+    modImplementation 'dev.isxander:yet-another-config-lib:3.8.1+1.21.11-fabric'
+    modCompileOnly 'com.terraformersmc:modmenu:17.0.1'
+    modLocalRuntime 'com.terraformersmc:modmenu:17.0.1'
+    modImplementation files(baseJar)
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(21)
+    withSourcesJar()
+}
+tasks.withType(JavaCompile).configureEach {
+    options.release = 21
+    options.encoding = 'UTF-8'
+}
+tasks.withType(AbstractArchiveTask).configureEach {
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
+}
+tasks.named('jar') { from(['LICENSE', 'THIRD_PARTY_NOTICES.md']) { into 'META-INF' } }
+
+sourceSets {
+    main {
+        java.srcDir "src/${side}/java"
+        resources.srcDir "src/${side}/resources"
+    }
+    checks {
+        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+        runtimeClasspath += sourceSets.main.output + sourceSets.main.runtimeClasspath
+    }
+    smoke {
+        java.srcDir "src/${side}Smoke/java"
+        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+        runtimeClasspath += sourceSets.main.runtimeClasspath
+    }
+}
+
+tasks.named('processResources') {
+    inputs.properties(side: side, sideName: sideName, baseMod: baseMod, baseVersion: baseVersion, version: project.version)
+    filesMatching('fabric.mod.json') {
+        expand(side: side, sideName: sideName, baseMod: baseMod, baseVersion: baseVersion, version: project.version,
+            otherSide: side == 'use' ? 'sell' : 'use')
+    }
+}
+tasks.named('processSmokeResources') {
+    inputs.property('side', side)
+    filesMatching('fabric.mod.json') { expand(side: side) }
+}
+tasks.register('verifyCoordination', JavaExec) {
+    dependsOn checksClasses
+    classpath = sourceSets.checks.runtimeClasspath
+    mainClass = 'dev.dualdonut.CoordinationChecks'
+    systemProperty 'dualdonut.side', side
+}
+tasks.named('check') { dependsOn 'verifyCoordination' }
+
+tasks.register('packageRelease', Zip) {
+    dependsOn tasks.named('build')
+    archiveFileName = "DualDonutControl-${sideName}-${project.version}-install.zip"
+    destinationDirectory = layout.buildDirectory.dir('distributions')
+    into('mods') {
+        from tasks.named('remapJar').flatMap { it.archiveFile }
+        from baseJar
+    }
+    into('sources') { from tasks.named('remapSourcesJar').flatMap { it.archiveFile } }
+    from 'README.md', 'LICENSE'
+    from 'THIRD_PARTY_NOTICES.md'
+}
+
+// Opt-in prelaunch check. Exits before Minecraft or the original entrypoints start.
+// This test mod is never included in the release JAR or ordinary development runs.
+if (providers.gradleProperty('mixinSmoke').isPresent()) {
+    loom {
+        mods {
+            "dualdonutcontrol_${side}" { sourceSet sourceSets.main }
+            dualdonutcontrol_smoke { sourceSet sourceSets.smoke }
+        }
+        runs {
+            mixinSmoke {
+                client()
+                source sourceSets.smoke
+                name = 'Mixin integration smoke check'
+                runDir = "build/${side}/mixin-smoke"
+            }
+        }
+    }
+    tasks.named('runMixinSmoke') { dependsOn tasks.named('smokeClasses') }
+}

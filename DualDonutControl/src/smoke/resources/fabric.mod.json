@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "id": "dualdonutcontrol_smoke",
+  "version": "1.0.0",
+  "name": "Dual Donut prelaunch checks",
+  "environment": "client",
+  "entrypoints": { "preLaunch": ["dev.dualdonut.smoke.MixinSmoke"] },
+  "depends": { "dualdonutcontrol_${side}": "*" }
+}

@@ -1,0 +1,8 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "dev.dualdonut.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": ["AutoUseControlMixin", "AutoUseKeysAccessor", "MasterAccessor", "OriginalRecoveryMixin", "AutoUseApiMixin", "SwordAlertMixin"],
+  "injectors": { "defaultRequire": 1 }
+}

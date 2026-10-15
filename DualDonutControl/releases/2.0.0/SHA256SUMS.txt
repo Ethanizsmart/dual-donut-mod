@@ -1,0 +1,4 @@
+f2f00956480353129ee8c22af0b94c5998e236e76bcc4d14e8fc2b8aaf461958  DualDonutControl-Sell-2.0.0.jar
+bfa07d92c6d8ad00fad32afc36201b01f18274be20796746dc3058d1a6e0f2ea  DualDonutControl-Sell-2.0.0-install.zip
+2f17beb305970340f279bff5869a113064704c277d06ece495d2ecec2a89b313  DualDonutControl-Use-2.0.0.jar
+31cf2bbb04dee8e9e46c73133563ddcb6d14cf44f3c1064dcd4933957d879c5a  DualDonutControl-Use-2.0.0-install.zip
