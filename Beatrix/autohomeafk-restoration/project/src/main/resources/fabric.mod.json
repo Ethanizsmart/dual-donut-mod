@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "autohomeafk",
+  "version": "1.0.0",
+  "name": "Auto Home AFK",
+  "description": "Tu dong khoa toa do 2D AFK -> khi lech khoi vi tri sau thoi gian chi dinh (phut) tu dong gui lenh lien tuc cho den khi ve lai moc.",
+  "authors": [
+    "Antigravity"
+  ],
+  "contact": {},
+  "license": "MIT",
+  "icon": "assets/autohomeafk/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "net.autohomeafk.AutoHomeAfkClient"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.18.0",
+    "minecraft": ">=1.21.11",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
+}

@@ -1,0 +1,11 @@
+﻿AutoUseMod 1.0.0; Minecraft 1.21.11; verified 2026-10-15
+Gradle 9.4.0; launcher/daemon/compiler JDK 21; runtime class major 65
+compileJava --rerun-tasks: PASS
+build: PASS
+verifyAuctionSwordRules: 54 passed
+verifyAutomationRules: 42 passed
+Runtime: 21 classes, no duplicate ZIP entries, no original mod package classes
+Entrypoint and all 4 listed mixin classes present; targets checked against Minecraft bytecode
+Game/server runtime and separate AutoSell integration: NOT TESTED
+Original backup SHA256: 
+5E4D7EB193F06C0C316746A240E0ECC850D6A5C676407FF31AFC83C1312D8C40

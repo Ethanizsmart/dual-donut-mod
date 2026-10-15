@@ -1,0 +1,8 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "dev.autouse.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": ["MinecraftClientMixin", "MinecraftClientInvoker", "DialogScreenAccessor", "SellCommandGuardMixin"],
+  "injectors": { "defaultRequire": 1 }
+}

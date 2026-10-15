@@ -1,0 +1,3 @@
+﻿https://repo.maven.apache.org/maven2/org/vineflower/vineflower/1.11.2/vineflower-1.11.2.jar
+SHA256=e1e2415e7f78b34960402c4beddfc88e033d7842a23ecd132a8ec2eadd54f6bf
+Published SHA256 verified

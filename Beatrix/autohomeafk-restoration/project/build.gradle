@@ -1,0 +1,61 @@
+plugins {
+    id 'fabric-loom' version '1.17.21'
+}
+
+version = '1.0.0'
+group = 'net.autohomeafk'
+
+repositories { mavenCentral() }
+
+configurations { intermediaryIdentity }
+dependencies {
+    intermediaryIdentity('net.fabricmc:intermediary:1.21.11:v2') { transitive = false }
+}
+
+// Recovered sources use production Intermediary names. Keep those identifiers
+// in Loom's development namespace instead of migrating the recovered code.
+def identityJar = layout.projectDirectory.file('.gradle/identity-mappings/1.21.11.jar').asFile
+def intermediaryJar = configurations.intermediaryIdentity.singleFile
+def tiny = zipTree(intermediaryJar).matching { include 'mappings/mappings.tiny' }.singleFile.getText('UTF-8')
+def lines = tiny.readLines()
+assert lines[0] == 'tiny\t2\t0\tofficial\tintermediary'
+def mapped = new StringBuilder('tiny\t2\t0\tofficial\tintermediary\tnamed\n')
+lines.drop(1).each { line ->
+    mapped.append(line)
+    if (line.startsWith('c\t') || line.startsWith('\tm\t') || line.startsWith('\tf\t')) {
+        mapped.append('\t').append(line.substring(line.lastIndexOf('\t') + 1))
+    }
+    mapped.append('\n')
+}
+identityJar.parentFile.mkdirs()
+def mappingBytes = new ByteArrayOutputStream()
+new java.util.jar.JarOutputStream(mappingBytes).withCloseable { out ->
+    def entry = new java.util.jar.JarEntry('mappings/mappings.tiny')
+    entry.time = 0L
+    out.putNextEntry(entry)
+    out.write(mapped.toString().getBytes('UTF-8'))
+    out.closeEntry()
+}
+if (!identityJar.exists() || !java.util.Arrays.equals(identityJar.bytes, mappingBytes.toByteArray())) {
+    identityJar.bytes = mappingBytes.toByteArray()
+}
+
+dependencies {
+    minecraft 'com.mojang:minecraft:1.21.11'
+    mappings files(identityJar)
+    modImplementation 'net.fabricmc:fabric-loader:0.18.2'
+    modImplementation 'net.fabricmc.fabric-api:fabric-api:0.141.6+1.21.11'
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(21)
+    withSourcesJar()
+}
+tasks.withType(JavaCompile).configureEach {
+    options.release = 21
+    options.encoding = 'UTF-8'
+}
+tasks.withType(AbstractArchiveTask).configureEach {
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
+}

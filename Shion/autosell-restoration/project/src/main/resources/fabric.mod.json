@@ -1,0 +1,30 @@
+{
+	"schemaVersion": 1,
+	"id": "autosell_donut",
+	"version": "1.3.3-webhook.1",
+	"name": "autosell",
+	"description": "tự động sell item trong sv minecraft ",
+	"authors": [
+		"zen1th_huy_15"
+	],
+	"contact": {
+		"my_discord": "hoshino1509"
+	},
+	"license": "All-Rights-Reserved",
+	"icon": "assets/autosell_donut/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"client": [
+			"hoshin.autosell.Autosell"
+		],
+		"modmenu": [
+			"hoshin.autosell.ModMenuIntegration"
+		]
+	},
+	"depends": {
+		"fabricloader": ">=0.19.3",
+		"minecraft": "~1.21.11",
+		"java": ">=21",
+		"fabric-api": "*"
+	}
+}

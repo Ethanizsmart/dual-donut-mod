@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "id": "autousemod",
+  "version": "1.0.0",
+  "name": "AutoUseMod",
+  "description": "Ominous Bottle > Rocket > Sword auto-use, 10-second Looting III sword recovery, Vex-aware death recovery and /home 1.",
+  "environment": "client",
+  "license": "MIT",
+  "entrypoints": { "client": ["dev.autouse.AutoUseMod"] },
+  "mixins": ["autousemod.mixins.json"],
+  "depends": {
+    "fabricloader": ">=0.18.4",
+    "minecraft": "1.21.11",
+    "java": ">=21",
+    "fabric-api": ">=0.141.3+1.21.11"
+  }
+}
