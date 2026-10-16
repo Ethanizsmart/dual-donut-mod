@@ -2,6 +2,7 @@ package dev.dualdonut;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import dev.dualdonut.runtime.HomeAnchorRules;
 import java.io.Reader;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
@@ -23,6 +24,8 @@ public final class ControlConfig {
     public String homeCommand = "home";
     public double homeDelayMinutes = 1.0, homeRepeatMinutes = 0.5, homeTolerance = 2.0;
     public double anchorX, anchorZ;
+    public boolean hasFacingAnchor = false;
+    public double anchorYaw, anchorPitch, homeFacingTolerance = 5.0;
     public boolean autoDisconnect = false, antiPlayer = false;
     public double disconnectRadius = 30.0, antiPlayerRadius = 5.0;
     public int clearDelayMs = 1000;
@@ -65,7 +68,13 @@ public final class ControlConfig {
         homeDelayMinutes = bounded(homeDelayMinutes, 1, 0.05, 1440);
         homeRepeatMinutes = bounded(homeRepeatMinutes, 0.5, 0.05, 1440);
         homeTolerance = bounded(homeTolerance, 2, 0.5, 100);
+        homeFacingTolerance = bounded(homeFacingTolerance, 5, 0.1, 180);
         if (!Double.isFinite(anchorX) || !Double.isFinite(anchorZ)) { anchorX = anchorZ = 0; hasAnchor = false; }
+        if (!Double.isFinite(anchorYaw) || !Double.isFinite(anchorPitch)) {
+            anchorYaw = anchorPitch = 0; hasFacingAnchor = false;
+        }
+        anchorYaw = HomeAnchorRules.wrapYaw(anchorYaw);
+        anchorPitch = Math.clamp(anchorPitch, -90, 90);
         trustedPlayers = trustedPlayers == null ? new ArrayList<>() : new ArrayList<>(trustedPlayers.stream().filter(v -> v != null && !v.isBlank()).map(String::strip).distinct().toList());
         detectionLog = detectionLog == null ? new ArrayList<>() : new ArrayList<>(detectionLog.stream().filter(v -> v != null && !v.isBlank()).limit(50).toList());
         webhookUrl = webhookUrl == null ? "" : webhookUrl.strip();

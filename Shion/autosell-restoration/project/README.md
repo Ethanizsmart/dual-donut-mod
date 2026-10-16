@@ -1,9 +1,17 @@
-# AutoSell Donut 1.3.3-webhook.1 — mã nguồn phục hồi và tích hợp AutoUseMod
+# AutoSell Donut 1.3.3-webhook.2 — mã nguồn phục hồi và tích hợp AutoUseMod
 
 Phục hồi từ `Shion/autosell_donut-1.3.3.jar` bằng Vineflower 1.11.2.
 Baseline phục hồi có 9 file Java chứa đủ 11 class của JAR gốc. Bản tích hợp
 thêm một helper dựng JSON cảnh báo mua kiếm. Tên Minecraft Intermediary
 (`class_*`, `method_*`, `field_*`) được giữ nguyên.
+
+## Cập nhật cho Dual Donut Control 2.0.1
+
+Bản `.2` chờ hết delay xác nhận bán, đóng đúng container của đợt bán rồi mới nghỉ
+`delay_sleep` hoặc tạm dừng vì hết item. Không đóng khi con trỏ còn cầm item.
+API `AutoSellLogic.canYieldForHome()` chỉ cho phép Control nhường quyền giữa các
+đợt bán, giữ chặn lúc scan/chuyển item và xác nhận. JAR `.1` trong
+`SwordWebhookIntegration/` được giữ nguyên để đối chiếu.
 
 ## Build
 
@@ -18,8 +26,8 @@ sau đó chạy tại thư mục chứa file này:
 
 Trên Linux/macOS: `bash ./gradlew build` với JDK 21.
 
-- JAR chạy: `build/libs/autosell_donut-1.3.3-webhook.1.jar`
-- JAR mã nguồn: `build/libs/autosell_donut-1.3.3-webhook.1-sources.jar`
+- JAR chạy: `build/libs/autosell_donut-1.3.3-webhook.2.jar`
+- JAR mã nguồn: `build/libs/autosell_donut-1.3.3-webhook.2-sources.jar`
 - Minecraft 1.21.11; Fabric Loader 0.19.3; Fabric API 0.141.6+1.21.11.
 - YACL 3.8.1+1.21.11-fabric phục vụ GUI; Mod Menu 17.0.1 phục vụ tích hợp menu.
 - Gradle 9.5.1, Loom 1.17.21, Java bytecode 21.

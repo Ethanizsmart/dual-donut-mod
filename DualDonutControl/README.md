@@ -1,4 +1,4 @@
-# Dual Donut Control 2.0.0 — hai profile Use / Sell
+# Dual Donut Control 2.0.1 — hai profile Use / Sell
 
 Hai mod Fabric client riêng cho **Minecraft 1.21.11 / Java 21**. Mỗi bản có GUI
 YACL đúng chức năng của phía mình, master **F8**, menu **F9**, giữ mốc/home tích hợp,
@@ -8,21 +8,21 @@ Vex Recovery, Auto Disconnect và AntiPlayer từ hành vi DonutUtility cũ.
 
 | Profile | Cài hai mod chính | Nội dung GUI |
 | --- | --- | --- |
-| **Phía dùng farm / Use** | **AutoUseMod 1.0.1 + DualDonutControl Use 2.0.0** | Hold RMB, AutoSword, cảnh báo thiếu tiền, bảo vệ người chơi, Vex Recovery, giữ mốc/home |
-| **Phía sell / Sell** | **AutoSell Shion 1.3.3-webhook.1 + DualDonutControl Sell 2.0.0** | AutoSell, delay, packet size, whitelist/blacklist item, điều khiển tin nhắn, báo cáo lợi nhuận, bảo vệ người chơi, Vex Recovery, giữ mốc/home |
+| **Phía dùng farm / Use** | **AutoUseMod 1.0.1 + DualDonutControl Use 2.0.1** | Hold RMB, AutoSword, cảnh báo thiếu tiền, bảo vệ người chơi, Vex Recovery, giữ mốc/home |
+| **Phía sell / Sell** | **AutoSell Shion 1.3.3-webhook.2 + DualDonutControl Sell 2.0.1** | AutoSell, delay, packet size, whitelist/blacklist item, điều khiển tin nhắn, báo cáo lợi nhuận, bảo vệ người chơi, Vex Recovery, giữ mốc/home |
 
 Phía farm cài:
 
 ```text
 mods/AutoUseMod-1.0.1.jar
-mods/DualDonutControl-Use-2.0.0.jar
+mods/DualDonutControl-Use-2.0.1.jar
 ```
 
 Phía sell cài:
 
 ```text
-mods/autosell_donut-1.3.3-webhook.1.jar
-mods/DualDonutControl-Sell-2.0.0.jar
+mods/autosell_donut-1.3.3-webhook.2.jar
+mods/DualDonutControl-Sell-2.0.1.jar
 ```
 
 Cả hai profile cần **Fabric Loader 0.19.3+**, **Fabric API 0.141.6+1.21.11** và
@@ -35,7 +35,7 @@ và chép `yet_another_config_lib_v3-3.8.1+1.21.11-fabric.jar` vào thư mục `
 của profile đó.** Chọn đúng bản Fabric 1.21.11. Không cần chép thêm nếu profile
 đã có bản tương thích; YACL không được đóng gói trong hai ZIP cài đặt.
 
-Tải bản phát hành: [GitHub Release v2.0.0](https://github.com/Ethanizsmart/dual-donut-mod/releases/tag/v2.0.0).
+Tải bản phát hành: [GitHub Release v2.0.1](https://github.com/Ethanizsmart/dual-donut-mod/releases/tag/v2.0.1).
 
 Dùng hai thư mục/profile Minecraft riêng. Chỉ cài bản Control tương ứng trong mỗi
 profile; Loader từ chối cài Use và Sell cùng nhau hoặc cùng Control 1.0.0 cũ.
@@ -45,7 +45,7 @@ Thay gói Control cũ bằng gói mới. Không cần AutoHome AFK riêng: chứ
 đã nằm trong cả hai bản Control; bỏ AutoHome riêng khỏi hai profile để tránh chạy
 hai engine home. Không chép file `-sources.jar` vào `mods`.
 
-Các bản phát hành được lưu tại `releases/2.0.0/` trong repository. Hai profile
+Các gói cài hiện tại được lưu tại `releases/2.0.1/` trong repository. Hai profile
 hoạt động độc lập, không gửi lệnh giữa các tài khoản/profile.
 
 ## Phím và lưu cấu hình
@@ -114,11 +114,19 @@ Module recovery gốc của AutoUse được giữ nguyên trong JAR gốc. Bả
 đó chạy trùng trong khi Control tự quản lý recovery. Bỏ Control Use thì AutoUse
 vẫn dùng module gốc. Bản Sell có recovery riêng, hoàn toàn không cần AutoUse.
 
-Giữ mốc/home dùng X/Z, bán kính, chờ khi lệch mốc và chu kỳ lặp như Beatrix; có nút
-đặt vị trí hiện tại làm mốc và hiển thị hotbar. Cài trực tiếp ở cả hai phía,
-không cần AutoHome AFK. Mặc định giữ mốc OFF để đặt đúng mốc của từng tài khoản.
-Đếm chờ home vẫn tiến khi bán/mua; chỉ gửi lệnh khi đã nhường GUI và hết luồng
-mua/bán. Lệnh home chưa có xác nhận teleport thành công từ server.
+AutoHome có hai nút riêng trong **Giữ mốc / Home**: **Lưu mốc** chỉ lưu X/Z;
+**Lưu hướng nhìn** chỉ lưu góc ngang (yaw) và dọc (pitch). Bật AutoHome rồi
+chỉnh lệnh, thời gian chờ/lặp, bán kính vị trí và dung sai hướng nhìn (mặc định
+5 độ cho mỗi góc). Lệch vị trí **hoặc** hướng nhìn sẽ đếm ngược về home. Yaw được
+so theo góc ngắn nhất qua ranh giới −180°/180°. Hướng nhìn chỉ được kiểm tra sau
+khi bấm nút lưu hướng; config cũ tiếp tục kiểm tra X/Z cho đến lúc đó.
+
+Đếm chờ home vẫn tiến khi bán/mua. AutoSell `.2` chờ hết delay xác nhận rồi đóng
+đúng menu của đợt bán trước khi nghỉ `delay_sleep` hoặc tạm dừng vì hết item.
+Khi home đến hạn, Control Sell có thể đóng menu bán đang rảnh để nhường quyền;
+không ngắt scan/chuyển item, `WAITING_MOVE`, xác nhận bán, chờ phản hồi `/sell`
+hay khi con trỏ còn cầm item. GUI khác vẫn chặn home. Sau lệnh home, khoảng chờ
+ổn định vẫn áp dụng. Lệnh home chưa có xác nhận teleport thành công từ server.
 
 ## Build và kiểm tra
 
@@ -134,15 +142,17 @@ phía đang build. Output tách thành `build/use/` và `build/sell/`.
 .\gradlew.bat runMixinSmoke -Pside=sell -PmixinSmoke -x downloadAssets
 ```
 
-- Use: `build/use/libs/DualDonutControl-Use-2.0.0.jar` và gói cài trong
+- Use: `build/use/libs/DualDonutControl-Use-2.0.1.jar` và gói cài trong
   `build/use/distributions/`.
-- Sell: `build/sell/libs/DualDonutControl-Sell-2.0.0.jar` và gói cài trong
+- Sell: `build/sell/libs/DualDonutControl-Sell-2.0.1.jar` và gói cài trong
   `build/sell/distributions/`.
-- Mỗi ZIP có runtime Control, đúng một JAR mod gốc, source JAR và tài liệu.
-- `verifyCoordination`: **121 kiểm tra Use**, **115 kiểm tra Sell** về Vex gate,
+- Mỗi ZIP chỉ có `mods/` với hai runtime JAR: Control và mod của đúng phía.
+  Không chứa source JAR, source code hoặc tài liệu rời. Release có đúng hai asset ZIP.
+- `verifyCoordination`: **136 kiểm tra Use**, **140 kiểm tra Sell** về Vex gate,
   recovery, interlock, nhận diện GUI, whitelist người chơi, thời gian AntiPlayer,
   hai lần thiếu pearl, gửi kill một lần, timeout, chờ vùng sạch, cấu hình hỏng,
-  payload webhook và hợp đồng bytecode của đúng mod gốc.
+  payload webhook, góc nhìn/yaw wrap, config cũ, pha nhường quyền của AutoSell
+  và hợp đồng bytecode của đúng mod gốc.
 - `runMixinSmoke`: Fabric Loader áp dụng mixin trên **8 lớp ở Use**, **7 lớp ở
   Sell**, xác minh class phía đối diện và AutoHome không tồn tại trong runtime.
   Dừng trước khi chạy entrypoint của mod gốc/Minecraft; không gọi auth, kết nối

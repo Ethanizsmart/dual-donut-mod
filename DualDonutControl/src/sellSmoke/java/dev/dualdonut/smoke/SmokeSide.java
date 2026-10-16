@@ -10,5 +10,9 @@ public final class SmokeSide {
             {"hoshin.autosell.AutoSellGui", "dualdonut$sharedGui"}
         };
     }
-    public static void verifyAccessors() {}
+    public static void verifyAccessors() throws Exception {
+        var type = Class.forName("hoshin.autosell.AutoSellLogic", false, SmokeSide.class.getClassLoader());
+        if (type.getDeclaredMethod("canYieldForHome").getReturnType() != boolean.class)
+            throw new AssertionError("AutoSell safe home handoff API is missing");
+    }
 }

@@ -7,6 +7,7 @@ import dev.dualdonut.runtime.SaleScreenRules;
 import dev.dualdonut.runtime.PlayerDetectionRules;
 import dev.dualdonut.runtime.AntiPlayerState;
 import dev.dualdonut.runtime.Notifications;
+import dev.dualdonut.runtime.HomeAnchorRules;
 import com.google.gson.JsonParser;
 import java.util.List;
 import java.io.IOException;
@@ -29,9 +30,11 @@ public final class CoordinationChecks {
         recoveryResets();
         arbitration();
         saleTitles();
+        homeAnchors();
         protection();
         configuration();
         mixinContracts();
+        if (System.getProperty("dualdonut.side").equals("sell")) saleHandoff();
         System.out.println("Dual Donut coordination checks passed: " + checks);
     }
 
@@ -139,6 +142,48 @@ public final class CoordinationChecks {
         check(SaleScreenRules.matches("Trade All", "sell|trade"), "custom server title can be configured");
     }
 
+    private static void homeAnchors() {
+        check(HomeAnchorRules.withinPosition(2, 0, 0, 0, 2), "position boundary stays safe");
+        check(!HomeAnchorRules.withinPosition(2.01, 0, 0, 0, 2), "position beyond radius requires home");
+        check(!HomeAnchorRules.withinPosition(1.5, 1.5, 0, 0, 2), "diagonal offset uses radial distance");
+        check(HomeAnchorRules.withinFacing(45, 30, 45, 30, 5), "saved facing matches");
+        check(HomeAnchorRules.withinFacing(50, 35, 45, 30, 5), "facing tolerance includes boundary");
+        check(!HomeAnchorRules.withinFacing(50.01, 30, 45, 30, 5), "yaw deviation alone requires home");
+        check(!HomeAnchorRules.withinFacing(45, 35.01, 45, 30, 5), "pitch deviation alone requires home");
+        check(HomeAnchorRules.withinFacing(-179, 0, 179, 0, 2), "yaw wraps across negative 180");
+        check(HomeAnchorRules.withinFacing(179, 0, -179, 0, 2), "yaw wrap works in both directions");
+        check(HomeAnchorRules.withinFacing(1080, 0, 0, 0, 0.1), "multiple yaw rotations preserve facing");
+        check(!HomeAnchorRules.withinFacing(0, -89, 0, 89, 5), "pitch never wraps across vertical limits");
+        check(!HomeAnchorRules.withinFacing(Double.NaN, 0, 0, 0, 5), "unknown facing cannot prove safety");
+        var old = new com.google.gson.Gson().fromJson("{\"hasAnchor\":true,\"anchorX\":12,\"anchorZ\":34}", ControlConfig.class);
+        check(old.hasAnchor && !old.hasFacingAnchor && old.homeFacingTolerance == 5, "old configs keep position without inventing a facing anchor");
+    }
+
+    /** Exercise the actual linked AutoSell phase gate without initializing its client entrypoint. */
+    private static void saleHandoff() throws Exception {
+        var type = Class.forName("hoshin.autosell.AutoSellLogic");
+        var reset = type.getMethod("reset");
+        var canYield = type.getMethod("canYieldForHome");
+        var current = type.getDeclaredField("currentState"); current.setAccessible(true);
+        var paused = type.getDeclaredField("pausedForBounty"); paused.setAccessible(true);
+        var waitScreen = type.getDeclaredField("waitForClearScreen"); waitScreen.setAccessible(true);
+        reset.invoke(null);
+        check((boolean) canYield.invoke(null), "idle sale can release its owned menu for home");
+        for (Object phase : current.getType().getEnumConstants()) {
+            current.set(null, phase);
+            boolean safe = phase.toString().equals("STEP1_CHECK_GUI") || phase.toString().equals("SLEEPING");
+            check((boolean) canYield.invoke(null) == safe, "sale handoff phase: " + phase);
+        }
+        reset.invoke(null);
+        paused.setBoolean(null, true);
+        check(!(boolean) canYield.invoke(null), "bounty pause retains sale ownership");
+        paused.setBoolean(null, false);
+        waitScreen.setBoolean(null, true);
+        check(!(boolean) canYield.invoke(null), "bounty GUI cleanup cannot be preempted by home");
+        waitScreen.setBoolean(null, false);
+        reset.invoke(null);
+    }
+
     /** Validate every external mixin target and the command call against the actual linked JARs. */
     private static void mixinContracts() throws IOException {
         if (System.getProperty("dualdonut.side").equals("use")) {
@@ -155,6 +200,7 @@ public final class CoordinationChecks {
         check(ClassLoader.getSystemResource("hoshin/autosell/Autosell.class") == null, "Use classpath contains no AutoSell");
         } else {
         method("hoshin/autosell/AutoSellLogic", "onTick", "(Lnet/minecraft/class_310;)V");
+        method("hoshin/autosell/AutoSellLogic", "canYieldForHome", "()Z");
         method("hoshin/autosell/Autosell", "processChatMessage", "(Ljava/lang/String;)V");
         method("hoshin/autosell/AutoSellGui", "createGui", "(Lnet/minecraft/class_437;)Lnet/minecraft/class_437;");
         check(ClassLoader.getSystemResource("dev/autouse/AutoUseMod.class") == null, "Sell classpath contains no AutoUse");
@@ -239,11 +285,16 @@ public final class CoordinationChecks {
         cfg.disconnectRadius = Double.NaN; cfg.antiPlayerRadius = 999; cfg.respawnDelayMs = -10;
         cfg.trustedPlayers = null; cfg.detectionLog = null; cfg.homeTolerance = Double.POSITIVE_INFINITY;
         cfg.killConfirmTitles = ""; cfg.recoveryHomeCommand = "///home 2";
+        cfg.homeFacingTolerance = Double.NaN; cfg.hasFacingAnchor = true; cfg.anchorYaw = Double.NaN;
         var validate = ControlConfig.class.getDeclaredMethod("validate"); validate.setAccessible(true); validate.invoke(cfg);
         check(cfg.disconnectRadius == 30 && cfg.antiPlayerRadius == 128, "sanitize invalid detection ranges");
         check(cfg.respawnDelayMs == 0 && cfg.homeTolerance == 2, "sanitize recovery and home ranges");
         check(cfg.trustedPlayers != null && cfg.detectionLog != null, "null lists are repaired");
         check(cfg.killConfirmTitles.equals("kill|suicide|tự sát") && cfg.recoveryHomeCommand.equals("home 2"), "repair blank confirm titles and normalize commands");
+        check(cfg.homeFacingTolerance == 5 && !cfg.hasFacingAnchor, "invalid facing values cannot arm an arbitrary direction");
+        cfg.homeFacingTolerance = -1; cfg.anchorYaw = 725; cfg.anchorPitch = 120;
+        validate.invoke(cfg);
+        check(cfg.homeFacingTolerance == 0.1 && cfg.anchorYaw == 5 && cfg.anchorPitch == 90, "normalize saved facing and clamp tolerance");
     }
 
     private static void method(String owner, String name, String descriptor) throws IOException {

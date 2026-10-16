@@ -94,6 +94,8 @@ public final class DualDonutControl implements ClientModInitializer {
     }
     public static boolean canTickHome(class_310 client) { return config != null && policy(client).homeTimer(config.homeEnabled); }
     public static boolean canRunHome(class_310 client) {
+        if (config == null || !canTickHome(client) || client.method_1562() == null) return false;
+        if (HomeAnchor.isDue()) SideIntegration.yieldForHome(client);
         return config != null && policy(client).home(config.homeEnabled, SideIntegration.busy(), false, client.field_1755 != null);
     }
     public static boolean sharedSellPause() { return config != null && master && !policy(class_310.method_1551()).ready(); }

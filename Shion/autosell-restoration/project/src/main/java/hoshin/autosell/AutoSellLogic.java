@@ -20,6 +20,15 @@ public class AutoSellLogic {
    public static boolean receivedMoneyThisCycle = false;
    private static boolean pausedForBounty = false;
    private static boolean waitForClearScreen = false;
+   private static class_1703 completedSaleHandler;
+   private static int sleepTicks;
+
+   /** Only yield between complete sale cycles, never during slot moves or confirmation. */
+   public static boolean canYieldForHome() {
+      return !pausedForBounty && !waitForClearScreen
+         && (currentState == State.STEP1_CHECK_GUI
+            || currentState == State.SLEEPING && completedSaleHandler == null);
+   }
 
    public static void pauseForBounty() {
       pausedForBounty = true;
@@ -38,16 +47,21 @@ public class AutoSellLogic {
          receivedMoneyThisCycle = false;
          waitForClearScreen = true;
          pausedForBounty = false;
+         completedSaleHandler = null;
+         sleepTicks = 0;
       }
    }
 
    public static void reset() {
       currentState = AutoSellLogic.State.STEP1_CHECK_GUI;
+      nextState = AutoSellLogic.State.STEP1_CHECK_GUI;
       waitTicks = 0;
       successCount = 0;
       noMoneyCount = 0;
       moveCount = 0;
       receivedMoneyThisCycle = false;
+      completedSaleHandler = null;
+      sleepTicks = 0;
    }
 
    private static boolean isItemInList(List<String> list, String itemId) {
@@ -74,6 +88,27 @@ public class AutoSellLogic {
                }
 
                waitForClearScreen = false;
+            }
+
+            // Give the confirmation click its normal response delay before closing.
+            // Handle this before state 2 as the no-items pause must close the menu too.
+            if (currentState == State.SLEEPING) {
+               if (waitTicks > 0) {
+                  waitTicks--;
+                  return;
+               }
+               if (completedSaleHandler != null) {
+                  if (client.field_1755 instanceof class_465 gui && gui.method_17577() == completedSaleHandler
+                     && client.field_1724.field_7512 == completedSaleHandler) {
+                     if (!completedSaleHandler.method_34255().method_7960()) return;
+                     client.field_1724.method_7346();
+                  }
+                  completedSaleHandler = null;
+                  waitTicks = sleepTicks;
+                  sleepTicks = 0;
+                  return;
+               }
+               currentState = State.STEP1_CHECK_GUI;
             }
 
             if (ConfigManager.state == 2) {
@@ -171,22 +206,28 @@ public class AutoSellLogic {
                   case STEP3_CONFIRM:
                      if (client.field_1755 instanceof class_465 gui) {
                         class_1703 menu = gui.method_17577();
+                        boolean confirmed = false;
 
                         for (class_1735 slot : menu.field_7761) {
                            if (slot.method_7677().method_31574(class_1802.field_8581)) {
                               client.field_1761.method_2906(menu.field_7763, slot.field_7874, 0, class_1713.field_7790, client.field_1724);
+                              confirmed = true;
                               break;
                            }
                         }
 
                         waitTicks = (int)(ConfigManager.delay_step * 20.0) + getRandomInt(1, 8);
+                        if (!confirmed) break;
+                        completedSaleHandler = menu;
+                        sleepTicks = 0;
+                        currentState = State.SLEEPING;
                         if (!receivedMoneyThisCycle) {
                            noMoneyCount++;
                            if (noMoneyCount >= 36) {
                               ConfigManager.state = 2;
                               ConfigManager.save();
                               client.field_1724.method_7353(class_2561.method_43470("§6[auto sell]: nghi ngờ hết item. Đã tạm dừng"), false);
-                              waitTicks = 10;
+                              waitTicks = Math.max(waitTicks, 10);
                               return;
                            }
                         } else {
@@ -198,11 +239,9 @@ public class AutoSellLogic {
                         if (successCount >= 10) {
                            successCount = 0;
                            client.field_1724.method_7353(class_2561.method_43470("§6[autosell]: tạm thời nghỉ để tránh sus"), false);
-                           waitTicks = (int)(ConfigManager.delay_sleep * 20.0) + getRandomInt(20, 200);
+                           sleepTicks = (int)(ConfigManager.delay_sleep * 20.0) + getRandomInt(20, 200);
                         }
 
-                        nextState = AutoSellLogic.State.STEP1_CHECK_GUI;
-                        currentState = AutoSellLogic.State.WAITING;
                      } else {
                         moveCount = 0;
                         waitTicks = (int)(ConfigManager.delay_step * 20.0);
