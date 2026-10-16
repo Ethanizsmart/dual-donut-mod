@@ -1,0 +1,18 @@
+﻿{
+    "package":  "DualDonutControl-Sell-2.0.3-install.zip",
+    "sha256":  "98b05abac0b3fda068aadaa101845495ad277839bde80a2beaaf8cb150a79524",
+    "jars":  [
+                 {
+                     "name":  "DualDonutControl-Sell-2.0.3.jar",
+                     "id":  "dualdonutcontrol_sell",
+                     "version":  "2.0.3",
+                     "sha256":  "96ea3160b7e65c50a1b4ada3cc60ba448c1b4a34cbc96b9eecb4bc0d5f9ceebb"
+                 },
+                 {
+                     "name":  "autosell_donut-1.3.3-webhook.3.jar",
+                     "id":  "autosell_donut",
+                     "version":  "1.3.3-webhook.3",
+                     "sha256":  "77ac554a13ccba7e8c37b82062b37938f5599417c612aad2fff9f2469c10010c"
+                 }
+             ]
+}

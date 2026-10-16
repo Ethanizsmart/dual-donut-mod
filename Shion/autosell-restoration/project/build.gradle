@@ -2,7 +2,7 @@ plugins {
     id 'fabric-loom' version '1.17.21'
 }
 
-version = '1.3.3-webhook.2'
+version = '1.3.3-webhook.3'
 group = 'hoshin.autosell'
 
 repositories {
@@ -62,14 +62,30 @@ tasks.withType(AbstractArchiveTask).configureEach {
 }
 
 sourceSets {
+    // Compile the same engine sources against an in-memory menu/server for offline regression checks.
+    // These doubles and checks are never included in the runtime JAR.
+    simulation
     checks {
         compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
         runtimeClasspath += sourceSets.main.output + sourceSets.main.runtimeClasspath
     }
+}
+tasks.named('compileSimulationJava') {
+    source files('src/main/java/hoshin/autosell/AutoSellLogic.java',
+        'src/main/java/hoshin/autosell/SellCommandPacing.java',
+        '../../../DualDonutControl/src/sell/java/dev/dualdonut/SideIntegration.java',
+        '../../../DualDonutControl/src/main/java/dev/dualdonut/GuiOptions.java',
+        '../../../DualDonutControl/src/main/java/dev/dualdonut/runtime/SaleScreenRules.java')
+    classpath += sourceSets.main.output + sourceSets.main.compileClasspath
+}
+tasks.register('verifySellSession', JavaExec) {
+    dependsOn simulationClasses
+    classpath = sourceSets.simulation.runtimeClasspath + sourceSets.main.runtimeClasspath
+    mainClass = 'hoshin.autosell.SellSessionChecks'
 }
 tasks.register('verifySwordWebhookPayload', JavaExec) {
     dependsOn checksClasses
     classpath = sourceSets.checks.runtimeClasspath
     mainClass = 'hoshin.autosell.SwordFundsWebhookPayloadChecks'
 }
-tasks.named('check') { dependsOn 'verifySwordWebhookPayload' }
+tasks.named('check') { dependsOn 'verifySwordWebhookPayload', 'verifySellSession' }

@@ -1,4 +1,4 @@
-# Dual Donut Control 2.0.1 — hai profile Use / Sell
+# Dual Donut Control — Use 2.0.2 / Sell 2.0.3
 
 Hai mod Fabric client riêng cho **Minecraft 1.21.11 / Java 21**. Mỗi bản có GUI
 YACL đúng chức năng của phía mình, master **F8**, menu **F9**, giữ mốc/home tích hợp,
@@ -8,21 +8,21 @@ Vex Recovery, Auto Disconnect và AntiPlayer từ hành vi DonutUtility cũ.
 
 | Profile | Cài hai mod chính | Nội dung GUI |
 | --- | --- | --- |
-| **Phía dùng farm / Use** | **AutoUseMod 1.0.1 + DualDonutControl Use 2.0.1** | Hold RMB, AutoSword, cảnh báo thiếu tiền, bảo vệ người chơi, Vex Recovery, giữ mốc/home |
-| **Phía sell / Sell** | **AutoSell Shion 1.3.3-webhook.2 + DualDonutControl Sell 2.0.1** | AutoSell, delay, packet size, whitelist/blacklist item, điều khiển tin nhắn, báo cáo lợi nhuận, bảo vệ người chơi, Vex Recovery, giữ mốc/home |
+| **Phía dùng farm / Use** | **AutoUseMod 1.0.1 + DualDonutControl Use 2.0.2** | Hold RMB, AutoSword, cảnh báo thiếu tiền, bảo vệ người chơi, Vex Recovery, giữ mốc/home |
+| **Phía sell / Sell** | **AutoSell Shion 1.3.3-webhook.3 + DualDonutControl Sell 2.0.3** | AutoSell, Auto Bounty và GUI cấu hình, delay, packet size, whitelist/blacklist item, điều khiển tin nhắn, báo cáo lợi nhuận, bảo vệ người chơi, Vex Recovery, giữ mốc/home |
 
 Phía farm cài:
 
 ```text
 mods/AutoUseMod-1.0.1.jar
-mods/DualDonutControl-Use-2.0.1.jar
+mods/DualDonutControl-Use-2.0.2.jar
 ```
 
 Phía sell cài:
 
 ```text
-mods/autosell_donut-1.3.3-webhook.2.jar
-mods/DualDonutControl-Sell-2.0.1.jar
+mods/autosell_donut-1.3.3-webhook.3.jar
+mods/DualDonutControl-Sell-2.0.3.jar
 ```
 
 Cả hai profile cần **Fabric Loader 0.19.3+**, **Fabric API 0.141.6+1.21.11** và
@@ -35,7 +35,8 @@ và chép `yet_another_config_lib_v3-3.8.1+1.21.11-fabric.jar` vào thư mục `
 của profile đó.** Chọn đúng bản Fabric 1.21.11. Không cần chép thêm nếu profile
 đã có bản tương thích; YACL không được đóng gói trong hai ZIP cài đặt.
 
-Tải bản phát hành: [GitHub Release v2.0.1](https://github.com/Ethanizsmart/dual-donut-mod/releases/tag/v2.0.1).
+Tải hai gói cài và xem hướng dẫn dễ hiểu tại
+[GitHub Release v2.0.3](https://github.com/Ethanizsmart/dual-donut-mod/releases/tag/v2.0.3).
 
 Dùng hai thư mục/profile Minecraft riêng. Chỉ cài bản Control tương ứng trong mỗi
 profile; Loader từ chối cài Use và Sell cùng nhau hoặc cùng Control 1.0.0 cũ.
@@ -45,7 +46,7 @@ Thay gói Control cũ bằng gói mới. Không cần AutoHome AFK riêng: chứ
 đã nằm trong cả hai bản Control; bỏ AutoHome riêng khỏi hai profile để tránh chạy
 hai engine home. Không chép file `-sources.jar` vào `mods`.
 
-Các gói cài hiện tại được lưu tại `releases/2.0.1/` trong repository. Hai profile
+Gói Sell ở `releases/2.0.3/`; Farm giữ gói `releases/2.0.2/`. Hai profile
 hoạt động độc lập, không gửi lệnh giữa các tài khoản/profile.
 
 ## Phím và lưu cấu hình
@@ -121,12 +122,43 @@ chỉnh lệnh, thời gian chờ/lặp, bán kính vị trí và dung sai hư�
 so theo góc ngắn nhất qua ranh giới −180°/180°. Hướng nhìn chỉ được kiểm tra sau
 khi bấm nút lưu hướng; config cũ tiếp tục kiểm tra X/Z cho đến lúc đó.
 
-Đếm chờ home vẫn tiến khi bán/mua. AutoSell `.2` chờ hết delay xác nhận rồi đóng
-đúng menu của đợt bán trước khi nghỉ `delay_sleep` hoặc tạm dừng vì hết item.
+Đếm chờ home vẫn tiến khi bán/mua. AutoSell `.3` giữ nguyên menu qua nhiều vòng
+bán, lúc scan rảnh và khi nghỉ `delay_sleep`; không xác nhận vòng không chuyển item.
+Chỉ có một yêu cầu `/sell` đang chờ, cửa sổ phản hồi 5 giây. Nếu không nhận menu:
+chờ thêm 5 giây trước lần thử thứ hai, 10 giây trước lần thử thứ ba, sau đó dừng
+gửi và báo tắt/bật để thử lại. Nhận menu sẽ xóa chuỗi retry và đặt cooldown mở lại
+5 giây. Whitelist/blacklist và cấu hình người dùng được giữ nguyên.
 Khi home đến hạn, Control Sell có thể đóng menu bán đang rảnh để nhường quyền;
 không ngắt scan/chuyển item, `WAITING_MOVE`, xác nhận bán, chờ phản hồi `/sell`
 hay khi con trỏ còn cầm item. GUI khác vẫn chặn home. Sau lệnh home, khoảng chờ
 ổn định vẫn áp dụng. Lệnh home chưa có xác nhận teleport thành công từ server.
+Khi tắt/nhường quyền, Control dừng gửi click mới, chờ hết delay đồng bộ đang có
+và đợi cursor trống trước khi đóng đúng menu sở hữu. AutoHome vẫn dùng nguyên
+interlock `AutomationPolicy.home`, chỉ chạy sau khi menu đã được đóng an toàn.
+
+## Auto Bounty — chỉ phía Sell
+
+Mở **F9 → Auto Bounty**, nhập tên người nhận, chọn **Bật Auto Bounty** rồi Save.
+Master F8 phải ON; Auto Bounty hoạt động độc lập với công tắc AutoSell. Mặc định
+OFF, tên trống nên không gửi lệnh ngoài ý muốn. Thiết lập riêng trong
+`config/dualdonutcontrol-sell-bounty.json`; không đọc/sửa config DonutUtility cũ.
+Farm không có runtime, thiết lập hay tab Auto Bounty.
+
+Giữ hành vi từ source có sẵn ở `D:/DonutUtil/restored-donututility`: đọc `/balance`,
+chỉ chạy từ $1M, dùng số dư làm tròn xuống theo 0,1 triệu, ví dụ $1.299.999 → 1.2m.
+Gửi `/bounty add <tên> <số tiền>`, chờ đúng **Confirm Bounty**, nút **Confirm** có
+tooltip **Click to add bounty**, đợi rồi kiểm tra lại handler/slot/cursor trước click.
+Chỉ ghi nhận thành công từ thông báo server đúng người nhận và số tiền.
+
+GUI có chu kỳ (mặc định 7 phút), chờ retry (7 giây), chờ trước lệnh (0,5 giây),
+chờ trước xác nhận (1 giây), trạng thái, số dư, lần gần nhất và đếm ngược.
+Mỗi phản hồi balance/GUI/success có timeout 5 giây. Retry luôn đọc số dư mới;
+trong backoff cho Sell/Home chạy. Không sao chép MaLiLib, AutoTPA hay AutoPay.
+
+Đợi AutoSell hoàn tất chuyển/xác nhận item mới nhường menu. Trong giao dịch
+bounty thì chặn Sell/Home, giữ ưu tiên Master, recovery, bảo vệ và home settle.
+Chỉ đóng GUI do yêu cầu bounty đang chạy sở hữu, sau đồng bộ và khi cursor trống.
+Không đóng rương khác và không dùng số slot fallback khi nhận diện lỗi.
 
 ## Build và kiểm tra
 
@@ -142,13 +174,13 @@ phía đang build. Output tách thành `build/use/` và `build/sell/`.
 .\gradlew.bat runMixinSmoke -Pside=sell -PmixinSmoke -x downloadAssets
 ```
 
-- Use: `build/use/libs/DualDonutControl-Use-2.0.1.jar` và gói cài trong
+- Use: `build/use/libs/DualDonutControl-Use-2.0.2.jar` và gói cài trong
   `build/use/distributions/`.
-- Sell: `build/sell/libs/DualDonutControl-Sell-2.0.1.jar` và gói cài trong
+- Sell: `build/sell/libs/DualDonutControl-Sell-2.0.3.jar` và gói cài trong
   `build/sell/distributions/`.
 - Mỗi ZIP chỉ có `mods/` với hai runtime JAR: Control và mod của đúng phía.
   Không chứa source JAR, source code hoặc tài liệu rời. Release có đúng hai asset ZIP.
-- `verifyCoordination`: **136 kiểm tra Use**, **140 kiểm tra Sell** về Vex gate,
+- `verifyCoordination`: **137 kiểm tra Use**, **143 kiểm tra Sell** về Vex gate,
   recovery, interlock, nhận diện GUI, whitelist người chơi, thời gian AntiPlayer,
   hai lần thiếu pearl, gửi kill một lần, timeout, chờ vùng sạch, cấu hình hỏng,
   payload webhook, góc nhìn/yaw wrap, config cũ, pha nhường quyền của AutoSell
@@ -157,8 +189,16 @@ phía đang build. Output tách thành `build/use/` và `build/sell/`.
   Sell**, xác minh class phía đối diện và AutoHome không tồn tại trong runtime.
   Dừng trước khi chạy entrypoint của mod gốc/Minecraft; không gọi auth, kết nối
   server hay gửi webhook. Source smoke không đi vào JAR phát hành.
+- Sell `verifyBounty` (tự chạy trong `check`): **69 kiểm tra** protocol, tiền làm
+  tròn, config/GUI snapshot, timeout, retry, xác nhận, cursor, ngắt Master và nhường
+  quyền. Mixin smoke còn xác minh GUI Bounty tồn tại ở Sell và không có ở Farm.
+- Project Shion: `check` chạy thêm **34 kiểm tra mô phỏng** trên cùng source
+  `AutoSellLogic` và `SideIntegration`, gồm 25 vòng bán cùng menu, nghỉ, menu rảnh,
+  response chậm, retry/backoff, home, tắt/bật nhanh và cursor còn item. Double
+  game/config chỉ nằm trong source set simulation, không vào runtime JAR.
 
 Đã build và qua hai nhóm kiểm tra nêu trên. **Chưa kiểm thử trên server thực tế**:
 khả năng server nhận projectile, GUI `/kill`, bán/mua kiếm, teleport và recovery
 phải kiểm tra trong game. GUI bán được nhận theo tên phản hồi sau `/sell` trong
-tối đa ba giây; server dùng tên khác cần sửa từ khóa trong tab Sell.
+tối đa năm giây; server dùng tên khác cần sửa từ khóa trong tab Sell.
+Không sửa case GUI chen ngang làm mất quyền sở hữu, theo phạm vi đã chốt.

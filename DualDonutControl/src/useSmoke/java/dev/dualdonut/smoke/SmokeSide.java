@@ -16,6 +16,8 @@ public final class SmokeSide {
         };
     }
     public static void verifyAccessors() {
+        if (SmokeSide.class.getClassLoader().getResource("dev/dualdonut/bounty/BountyRuntime.class") != null)
+            throw new AssertionError("Farm must not contain Auto Bounty");
         MasterAccessor.dualdonut$setEnabled(true);
         if (!MasterAutomation.isEnabled()) throw new AssertionError("Master accessor failed");
         MasterAccessor.dualdonut$setEnabled(false);

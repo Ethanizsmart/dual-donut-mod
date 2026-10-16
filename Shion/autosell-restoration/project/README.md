@@ -1,17 +1,21 @@
-# AutoSell Donut 1.3.3-webhook.2 — mã nguồn phục hồi và tích hợp AutoUseMod
+# AutoSell Donut 1.3.3-webhook.3 — mã nguồn phục hồi và tích hợp AutoUseMod
 
 Phục hồi từ `Shion/autosell_donut-1.3.3.jar` bằng Vineflower 1.11.2.
 Baseline phục hồi có 9 file Java chứa đủ 11 class của JAR gốc. Bản tích hợp
 thêm một helper dựng JSON cảnh báo mua kiếm. Tên Minecraft Intermediary
 (`class_*`, `method_*`, `field_*`) được giữ nguyên.
 
-## Cập nhật cho Dual Donut Control 2.0.1
+## Cập nhật cho Dual Donut Control 2.0.2
 
-Bản `.2` chờ hết delay xác nhận bán, đóng đúng container của đợt bán rồi mới nghỉ
-`delay_sleep` hoặc tạm dừng vì hết item. Không đóng khi con trỏ còn cầm item.
-API `AutoSellLogic.canYieldForHome()` chỉ cho phép Control nhường quyền giữa các
-đợt bán, giữ chặn lúc scan/chuyển item và xác nhận. JAR `.1` trong
-`SwordWebhookIntegration/` được giữ nguyên để đối chiếu.
+Bản `.3` giữ cùng menu khi bán xong, lúc scan rảnh và nghỉ `delay_sleep`, không
+tự đóng rồi mở lại. Không bấm confirm nếu chưa chuyển item. Whitelist/blacklist
+giữ nguyên; người dùng tự tắt whitelist nếu không muốn dùng bộ lọc.
+`SellCommandPacing` chỉ cho một `/sell` đang chờ, timeout 5 giây, backoff 5/10 giây,
+tối đa 3 lần thử rồi báo tắt/bật để thử lại. Menu nhận được đặt cooldown mở lại 5 giây.
+API `AutoSellLogic.canYieldForHome()` giữ chặn lúc chuyển item/xác nhận;
+`tickRelease()` cho Control dừng click mới và chờ đồng bộ trước khi nhường GUI,
+kể cả khi engine đã OFF. Cursor vẫn phải trống trước khi Control đóng menu.
+JAR `.1` và `.2` trong `SwordWebhookIntegration/` được giữ nguyên để đối chiếu.
 
 ## Build
 
@@ -26,8 +30,8 @@ sau đó chạy tại thư mục chứa file này:
 
 Trên Linux/macOS: `bash ./gradlew build` với JDK 21.
 
-- JAR chạy: `build/libs/autosell_donut-1.3.3-webhook.2.jar`
-- JAR mã nguồn: `build/libs/autosell_donut-1.3.3-webhook.2-sources.jar`
+- JAR chạy: `build/libs/autosell_donut-1.3.3-webhook.3.jar`
+- JAR mã nguồn: `build/libs/autosell_donut-1.3.3-webhook.3-sources.jar`
 - Minecraft 1.21.11; Fabric Loader 0.19.3; Fabric API 0.141.6+1.21.11.
 - YACL 3.8.1+1.21.11-fabric phục vụ GUI; Mod Menu 17.0.1 phục vụ tích hợp menu.
 - Gradle 9.5.1, Loom 1.17.21, Java bytecode 21.
@@ -50,8 +54,15 @@ gửi. Không cần bật engine bán đồ để dùng cảnh báo này. Cầu 
 `WebhookManager.notifySwordInsufficientFunds(String, long)` dùng config hiện tại;
 không phụ thuộc khoảng báo cáo lợi nhuận 60 phút và không reset số liệu lợi nhuận.
 
-`build` chạy 12 kiểm tra payload offline, gồm Unicode/escape JSON, nội dung tiếng
-Việt và giá đang mua. Chưa gửi webhook thật hoặc chạy game để xác minh server.
+`build` chạy 12 kiểm tra payload offline và 34 kiểm tra engine/coordinator bằng
+menu trong bộ nhớ: 25 vòng cùng GUI, nghỉ, rảnh, response chậm, retry/backoff và
+nhường home/stop/cursor/bounty. Source set `simulation` biên dịch cùng source engine và
+Control Sell từ monorepo với game/config double; không đi vào runtime/source JAR.
+Chưa gửi webhook thật hoặc chạy game để xác minh server.
+
+Auto Bounty nằm riêng trong Control Sell 2.0.3, không thêm vào JAR Shion hoặc Farm.
+Simulation dùng stub Bounty để cô lập coordinator bán; logic Bounty thật được
+kiểm tra bởi `verifyBounty` tại project Control Sell.
 
 ## Điểm bắt đầu chỉnh sửa
 
@@ -66,8 +77,8 @@ Việt và giá đang mua. Chưa gửi webhook thật hoặc chạy game để x
 | `ModExpiration.java` | Helper kiểm tra hết hạn; không tìm thấy caller trong mod |
 | `ModMenuIntegration.java` | Mở GUI qua Mod Menu |
 
-Build đã được kiểm tra thành công. Chưa chạy Minecraft, xác nhận mod load,
-thao tác bán đồ, xác thực hoặc webhook. Có 12 kiểm tra payload offline.
+Build đã được kiểm tra thành công. Mixin smoke tại project Control đã qua cho cả
+Use và Sell; chưa kiểm tra bán/teleport/xác thực/webhook trên server thực tế.
 Code xác thực và các hành vi khác của bản gốc được giữ nguyên. Xem báo cáo
 `../RESTORATION.md` trong thư mục phục hồi để biết phạm vi đối chiếu baseline
 trước khi thêm cầu nối webhook ngày 16/10/2026.

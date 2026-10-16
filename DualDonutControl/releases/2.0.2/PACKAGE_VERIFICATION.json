@@ -1,0 +1,38 @@
+﻿[
+    {
+        "package":  "DualDonutControl-Use-2.0.2-install.zip",
+        "sha256":  "aaeccc077576f5bff0735489b6dd0c5f59b29484fdaeca64467987601e772403",
+        "jars":  [
+                     {
+                         "name":  "DualDonutControl-Use-2.0.2.jar",
+                         "id":  "dualdonutcontrol_use",
+                         "version":  "2.0.2",
+                         "sha256":  "61e4dc34dbab70681f4d0be6e570c9b9feb85c7ca1781fcd049d03d4c10fcb30"
+                     },
+                     {
+                         "name":  "AutoUseMod-1.0.1.jar",
+                         "id":  "autousemod",
+                         "version":  "1.0.1",
+                         "sha256":  "a6e17aa0e07db89c8e4734d11adec7919f6c374ca0c995125e93630d2899d1f2"
+                     }
+                 ]
+    },
+    {
+        "package":  "DualDonutControl-Sell-2.0.2-install.zip",
+        "sha256":  "1b7271511144eec793fe71144f624077ba9b67a9e6550875477d006a44bc4400",
+        "jars":  [
+                     {
+                         "name":  "DualDonutControl-Sell-2.0.2.jar",
+                         "id":  "dualdonutcontrol_sell",
+                         "version":  "2.0.2",
+                         "sha256":  "e54e40b462c8ec4b1c806669ad536c156d5b42d7b3637e28660f59fc95ab8c51"
+                     },
+                     {
+                         "name":  "autosell_donut-1.3.3-webhook.3.jar",
+                         "id":  "autosell_donut",
+                         "version":  "1.3.3-webhook.3",
+                         "sha256":  "77ac554a13ccba7e8c37b82062b37938f5599417c612aad2fff9f2469c10010c"
+                     }
+                 ]
+    }
+]

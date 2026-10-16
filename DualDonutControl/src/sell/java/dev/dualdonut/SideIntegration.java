@@ -2,10 +2,12 @@ package dev.dualdonut;
 
 import static dev.dualdonut.GuiOptions.*;
 import dev.dualdonut.runtime.SaleScreenRules;
+import dev.dualdonut.bounty.BountyRuntime;
 import dev.isxander.yacl3.api.*;
 import hoshin.autosell.AutoSellLogic;
 import hoshin.autosell.Autosell;
 import hoshin.autosell.ConfigManager;
+import hoshin.autosell.SellCommandPacing;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
@@ -19,19 +21,31 @@ public final class SideIntegration {
     private static class_1703 saleHandler;
     private static long awaitUntil;
     private static boolean suspended = true;
+    private static boolean releaseRequested;
     private SideIntegration() {}
     public static boolean consumeToggle() { return DualDonutControl.consume(Autosell.toggleKey); }
     public static boolean consumeSettings() { return DualDonutControl.consume(Autosell.openGuiKey); }
+    /** Called once by the client tick driver, even when the base engine is disabled. */
+    public static void tickRelease(class_310 client) {
+        if (releaseRequested) { AutoSellLogic.tickRelease(); cancel(client); }
+    }
     public static void reconcile(class_310 client, boolean selected, boolean ready) {
         if (!selected) { ConfigManager.state = 0; cancel(client); }
         else {
-            if (ConfigManager.state == 0) { ConfigManager.state = 1; AutoSellLogic.reset(); }
+            if (ConfigManager.state == 0 && !releaseRequested) { ConfigManager.state = 1; AutoSellLogic.reset(); }
             if (!ready) cancel(client);
         }
     }
     private static boolean owns(class_310 client) { return saleHandler != null && client.field_1755 instanceof class_465 gui && gui.method_17577() == saleHandler; }
-    public static boolean screenAllowed(class_310 client) { return client.field_1755 == null || owns(client); }
-    public static boolean busy() { return saleHandler != null || System.currentTimeMillis() < awaitUntil; }
+    public static boolean screenAllowed(class_310 client) { return !releaseRequested && !BountyRuntime.blocksSell() && (client.field_1755 == null || owns(client)); }
+    private static boolean saleBusy() { return saleHandler != null || System.currentTimeMillis() < awaitUntil; }
+    public static boolean busy() { return saleBusy() || BountyRuntime.busy(); }
+    public static boolean acquireForBounty(class_310 client) {
+        yieldForHome(client);
+        return !saleBusy() && !releaseRequested && client.field_1724 != null && client.field_1755 == null
+            && client.field_1724.field_7512 == client.field_1724.field_7498
+            && client.field_1724.field_7512.method_34255().method_7960();
+    }
     public static void yieldForHome(class_310 client) {
         // Never interrupt a pending /sell response, item batch, or confirmation.
         if (owns(client) && client.field_1724 != null && client.field_1724.field_7512 == saleHandler
@@ -39,11 +53,19 @@ public final class SideIntegration {
             && saleHandler.method_34255().method_7960()) cancel(client);
     }
     public static void cancel(class_310 client) {
-        if (!suspended || busy()) {
-            if (owns(client) && client.field_1724 != null) client.field_1724.method_7346();
+        if (!suspended || saleBusy()) {
+            if (owns(client) && client.field_1724 != null) {
+                if (client.field_1724.field_7512 != saleHandler || !AutoSellLogic.canYieldForHome()
+                    || !saleHandler.method_34255().method_7960()) {
+                    releaseRequested = true;
+                    suspended = true;
+                    return;
+                }
+                client.field_1724.method_7346();
+            }
             AutoSellLogic.reset();
         }
-        saleHandler = null; awaitUntil = 0; suspended = true;
+        saleHandler = null; awaitUntil = 0; suspended = true; releaseRequested = false;
     }
     public static void refresh(class_310 client) {
         if (saleHandler != null && !owns(client)) saleHandler = null;
@@ -56,8 +78,8 @@ public final class SideIntegration {
         if (DualDonutControl.canRunSell(client)) suspended = false;
         else cancel(client);
     }
-    public static void saleCommandSent() { awaitUntil = System.currentTimeMillis() + 3000; }
-    public static void save() { ConfigManager.save(); }
+    public static void saleCommandSent() { awaitUntil = System.currentTimeMillis() + SellCommandPacing.RESPONSE_TIMEOUT_MS; }
+    public static void save() { ConfigManager.save(); BountyRuntime.save(); }
     public static String webhookUrl() { return ConfigManager.webhook_url; }
     public static void setWebhookUrl(String value) { ConfigManager.webhook_url = value; }
     public static List<Option<?>> webhookOptions() {
@@ -90,6 +112,7 @@ public final class SideIntegration {
             ConfigCategory.createBuilder().name(text("Blacklist item"))
                 .group(OptionGroup.createBuilder().name(text("Chế độ Blacklist"))
                     .option(bool("Bật Blacklist item", "Khi BẬT: Bot TUYỆT ĐỐI KHÔNG BÁN những vật phẩm có ID nằm trong danh sách Blacklist này.\n§7Dùng để bảo vệ đồ giá trị, vũ khí, giáp, shulker box.", false, () -> ConfigManager.enable_blacklist, value -> ConfigManager.enable_blacklist = value)).build())
-                .group(strings("ID item cấm bán", "Nhập ID vật phẩm không muốn bán (Ví dụ: diamond_sword, netherite_pickaxe, shulker_box).\n§7Bấm [+] để thêm dòng mới, [x] để xóa.", () -> ConfigManager.blacklist, value -> ConfigManager.blacklist = value)).build());
+                .group(strings("ID item cấm bán", "Nhập ID vật phẩm không muốn bán (Ví dụ: diamond_sword, netherite_pickaxe, shulker_box).\n§7Bấm [+] để thêm dòng mới, [x] để xóa.", () -> ConfigManager.blacklist, value -> ConfigManager.blacklist = value)).build(),
+            BountyRuntime.category());
     }
 }

@@ -8,9 +8,9 @@ chỉnh sửa được. Các project dùng Java 21 và giữ tên Minecraft Inte
 
 | Đường dẫn | Mod | Mục đích |
 | --- | --- | --- |
-| `DualDonutControl/` | Dual Donut Control Use / Sell 2.0.1 | Hai profile riêng, GUI theo phía, master F8, Vex Recovery, giữ mốc vị trí/hướng nhìn và hai chế độ phát hiện người chơi. |
+| `DualDonutControl/` | Use 2.0.2 / Sell 2.0.3 | Hai profile riêng; Auto Bounty có GUI chỉ ở Sell, master F8, Vex Recovery, giữ mốc vị trí/hướng nhìn và hai chế độ phát hiện người chơi. |
 | `AutoUseMod/` | AutoUseMod 1.0.1 | Giữ RMB, AutoSword, AutoRecovery và tích hợp AutoSell. |
-| `Shion/autosell-restoration/project/` | AutoSell Donut 1.3.3-webhook.2 | AutoSell, tự đóng menu khi bán xong/nghỉ, cấu hình GUI và cảnh báo Discord webhook. |
+| `Shion/autosell-restoration/project/` | AutoSell Donut 1.3.3-webhook.3 | AutoSell giữ menu khi bán/nghỉ, chờ phản hồi và giới hạn retry `/sell`, cấu hình GUI và cảnh báo Discord webhook. |
 | `Beatrix/autohomeafk-restoration/project/` | Auto Home AFK 1.0.0 | Giữ mốc X/Z, đếm AFK và gửi lệnh home theo chu kỳ. |
 | `SwordWebhookIntegration/` | Gói bàn giao | Tài liệu và JAR cho tích hợp cảnh báo thiếu tiền mua kiếm. |
 
@@ -44,18 +44,19 @@ log và dữ liệu runtime vào repository.
 
 ## Hai profile Donut Control
 
-- **Phía dùng farm:** cài **AutoUseMod 1.0.1 + DualDonutControl Use 2.0.1** để giữ RMB
+- **Phía dùng farm:** cài **AutoUseMod 1.0.1 + DualDonutControl Use 2.0.2** để giữ RMB
   và mua kiếm. GUI chỉ hiển thị chức năng Use cùng các bảo vệ chung.
-- **Phía sell:** cài **AutoSell Shion 1.3.3-webhook.2 + DualDonutControl Sell 2.0.1**
+- **Phía sell:** cài **AutoSell Shion 1.3.3-webhook.3 + DualDonutControl Sell 2.0.3**
   để tự bán đồ. GUI hiển thị delay, lọc item, tin nhắn và webhook Sell cùng các bảo vệ chung.
 - Cả hai bản đều tích hợp Auto Disconnect, AntiPlayer, Vex Recovery và giữ mốc/home;
   không cần AutoHome riêng. Cài Fabric API và YACL trong mỗi profile.
 - **Nếu profile chưa có YACL, bắt buộc cài thêm
   [YACL 3.8.1 cho Fabric / Minecraft 1.21.11](https://modrinth.com/mod/yacl/version/NWFsMIGn)
   vào thư mục `mods` của từng profile Use/Sell.** YACL không có sẵn trong hai ZIP cài đặt.
-- [GitHub Release v2.0.1](https://github.com/Ethanizsmart/dual-donut-mod/releases/tag/v2.0.1)
+- [GitHub Release v2.0.3](https://github.com/Ethanizsmart/dual-donut-mod/releases/tag/v2.0.3)
   có đúng hai ZIP Farm/Use và Sell, mỗi ZIP chỉ chứa hai JAR chạy game, không có source.
-- Gói cài: [DualDonutControl/releases/2.0.1](DualDonutControl/releases/2.0.1/).
+- Gói cài: [Sell 2.0.3 có Auto Bounty](DualDonutControl/releases/2.0.3/) và
+  [Farm/Use 2.0.2 giữ nguyên](DualDonutControl/releases/2.0.2/).
   Chi tiết cài đặt và kiểm tra: [DualDonutControl/README.md](DualDonutControl/README.md).
 
 ## Lưu ý

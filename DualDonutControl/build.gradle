@@ -2,14 +2,14 @@ plugins {
     id 'fabric-loom' version '1.17.21'
 }
 
-version = '2.0.1'
 group = 'dev.dualdonut'
 def side = providers.gradleProperty('side').getOrElse('use')
 if (!(side in ['use', 'sell'])) throw new GradleException('Use -Pside=use or -Pside=sell')
+version = side == 'sell' ? '2.0.3' : '2.0.2'
 def sideName = side.capitalize()
 def baseMod = side == 'use' ? 'autousemod' : 'autosell_donut'
-def baseVersion = side == 'use' ? '1.0.1' : '1.3.3-webhook.2'
-def baseJar = side == 'use' ? '../SwordWebhookIntegration/AutoUseMod-1.0.1.jar' : '../SwordWebhookIntegration/autosell_donut-1.3.3-webhook.2.jar'
+def baseVersion = side == 'use' ? '1.0.1' : '1.3.3-webhook.3'
+def baseJar = side == 'use' ? '../SwordWebhookIntegration/AutoUseMod-1.0.1.jar' : '../SwordWebhookIntegration/autosell_donut-1.3.3-webhook.3.jar'
 base { archivesName = "DualDonutControl-${sideName}" }
 layout.buildDirectory = layout.projectDirectory.dir("build/${side}")
 
@@ -81,6 +81,7 @@ sourceSets {
         resources.srcDir "src/${side}/resources"
     }
     checks {
+        java.srcDir "src/${side}Checks/java"
         compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
         runtimeClasspath += sourceSets.main.output + sourceSets.main.runtimeClasspath
     }
@@ -109,6 +110,14 @@ tasks.register('verifyCoordination', JavaExec) {
     systemProperty 'dualdonut.side', side
 }
 tasks.named('check') { dependsOn 'verifyCoordination' }
+if (side == 'sell') {
+    tasks.register('verifyBounty', JavaExec) {
+        dependsOn checksClasses
+        classpath = sourceSets.checks.runtimeClasspath
+        mainClass = 'dev.dualdonut.bounty.BountyChecks'
+    }
+    tasks.named('check') { dependsOn 'verifyBounty' }
+}
 
 tasks.register('packageRelease', Zip) {
     dependsOn tasks.named('build')

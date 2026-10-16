@@ -198,12 +198,15 @@ public final class CoordinationChecks {
         method("dev/autouse/api/AutoUseApi", "pauseReason", "()Ljava/lang/String;");
         method("dev/autouse/AutoSellWebhookBridge", "insufficientFunds", "(Ljava/lang/String;J)V");
         check(ClassLoader.getSystemResource("hoshin/autosell/Autosell.class") == null, "Use classpath contains no AutoSell");
+        check(ClassLoader.getSystemResource("dev/dualdonut/bounty/BountyRuntime.class") == null, "Farm contains no Auto Bounty runtime or GUI");
         } else {
         method("hoshin/autosell/AutoSellLogic", "onTick", "(Lnet/minecraft/class_310;)V");
         method("hoshin/autosell/AutoSellLogic", "canYieldForHome", "()Z");
+        method("hoshin/autosell/AutoSellLogic", "tickRelease", "()V");
         method("hoshin/autosell/Autosell", "processChatMessage", "(Ljava/lang/String;)V");
         method("hoshin/autosell/AutoSellGui", "createGui", "(Lnet/minecraft/class_437;)Lnet/minecraft/class_437;");
         check(ClassLoader.getSystemResource("dev/autouse/AutoUseMod.class") == null, "Sell classpath contains no AutoUse");
+        method("dev/dualdonut/bounty/BountyRuntime", "category", "()Ldev/isxander/yacl3/api/ConfigCategory;");
         int[] calls = {0};
         new ClassReader("hoshin/autosell/AutoSellLogic").accept(new ClassVisitor(Opcodes.ASM9) {
             @Override public MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {

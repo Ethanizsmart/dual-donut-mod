@@ -11,8 +11,14 @@ public final class SmokeSide {
         };
     }
     public static void verifyAccessors() throws Exception {
+        var bounty = Class.forName("dev.dualdonut.bounty.BountyRuntime", false, SmokeSide.class.getClassLoader());
+        bounty.getDeclaredMethods();
+        if (!bounty.getMethod("category").getReturnType().getName().equals("dev.isxander.yacl3.api.ConfigCategory"))
+            throw new AssertionError("Sell Auto Bounty GUI is missing");
         var type = Class.forName("hoshin.autosell.AutoSellLogic", false, SmokeSide.class.getClassLoader());
         if (type.getDeclaredMethod("canYieldForHome").getReturnType() != boolean.class)
             throw new AssertionError("AutoSell safe home handoff API is missing");
+        if (type.getDeclaredMethod("tickRelease").getReturnType() != void.class)
+            throw new AssertionError("AutoSell deferred stop API is missing");
     }
 }
